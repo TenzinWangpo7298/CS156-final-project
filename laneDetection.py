@@ -1,11 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-import glob
-from moviepy.editor import VideoFileClip
-
-# here we will get all the jpg image from the test image and store it in testImage array
-testImage = [path for path in glob.glob("test_images/*.jpg")]
 
 
 def imageShow(images, cmap=None):
@@ -195,6 +190,7 @@ def bestLine(linesFromHoughLineP):
         else:
             # if it 0, then ignore it because lane can't be straight line with no slope
             continue
+            
     # now we have separated the both left lane and right lane
     medianYinterceptLeftLane = left_intercept[len(left_intercept) // 2]
     medianYinterceptRightLane = right_intercept[len(right_intercept) // 2]
@@ -248,3 +244,4 @@ def pipeline(image):
         x1, y1, x2, y2 = line[0], line[1], line[2], line[3]
         cv2.line(image, (x1, y1), (x2, y2), color=[0, 255, 0], thickness=15)
     return image
+
