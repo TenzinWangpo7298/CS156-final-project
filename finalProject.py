@@ -40,39 +40,45 @@ def convertImageToHLS(image):
 
 
 def selectWhiteAndYellow(image):
-    """
-    this function will select the white and yellow pixel value only, if the pixel value is
-    not in the range of yellow and white threshold then it will make it 0, or black
-    because usually the highway road lane color is either yellow or white and all other color are not useful
-    """
+   
+#     this function will select the white and yellow pixel value only, if the pixel value is
+#     not in the range of yellow and white threshold then it will make it 0, or black
+#     because usually the highway road lane color is either yellow or white and all other color are not useful
+ 
     # lower and upper threshold for white pixel
     lowerWhite = np.uint8([0, 200, 0])
     upperWhite = np.uint8([255, 255, 255])
+    
     # lower and upper threshold for yellow pixel
     lowerYellow = np.uint8([10, 0, 100])
     upperYellow = np.uint8([40, 255, 255])
+    
     # extract the pixel which is in white threshold and all other make it black
-    maskWhite = cv2.inRange(image, lowerWhite, upperWhite)
+    maskWhite = cv2.inRange( image, lowerWhite, upperWhite )
+    
     # same here except it is yellow threshold, all other black
-    maskYellow = cv2.inRange(image, lowerYellow, upperYellow)
+    maskYellow = cv2.inRange( image, lowerYellow, upperYellow )
+    
     # here we will take both white and yellow threshold and if the pixel is either in
     # white and yellow threshold, then we choose it else make the pixel black or ignore
-    orMask = cv2.bitwise_or(maskWhite, maskYellow)
+    orMask = cv2.bitwise_or ( maskWhite, maskYellow )
+    
     # then we apply this mask to the input image, so basically if the pixel in orMask image is white
     # then it will retain the pixel value, else make it 0 or black
     # or we can define as if both image and ormask has value,
     # then retain the pixel value else make 0 (and definition)
-    final_mask = cv2.bitwise_and(image, image, mask=orMask)
+  
+    final_mask = cv2.bitwise_and( image, image, mask = orMask )
     return final_mask
 
 
-def gaussainBlur(image, kernelSize=15):
-    """
-    this function is normalizing the pixel value with surrounding pixel value,
-    or in other terms, it is blurring ro smoothing the image by convolving the kernel size
-    square matrix over the image and applying the Gaussian algorithm.
-    """
-    return cv2.GaussianBlur(image, (kernelSize, kernelSize), 0)
+def gaussainBlur(image, kernelSize = 15 ):
+#    
+#     this function is normalizing the pixel value with surrounding pixel value,
+#     or in other terms, it is blurring ro smoothing the image by convolving the kernel size
+#     square matrix over the image and applying the Gaussian algorithm.
+#   
+    return cv2.GaussianBlur( image, ( kernelSize, kernelSize ), 0 )
 
 
 def cannyEdgeDetection(image, lowerThreshold=50, upperThreshold=150):
@@ -82,32 +88,34 @@ def cannyEdgeDetection(image, lowerThreshold=50, upperThreshold=150):
     return cv2.Canny(image, lowerThreshold, upperThreshold)
 
 
-def ROI(image):
-    """
-    ROI is Region Of Interest, where we basically make unwanted information in image to 0 or black,
-    for example, the upper half part of image is useless where most of them are sky
-    so our region of interest is lower half part of image, so we make upper part black, and retain
-    the lower part.
-    """
-    # first we will create a same size of image with all black pixel or black image
-    mask = np.zeros_like(image)
-    if len(image.shape) > 2:
-        ROIMask = (255,) * image.shape[2]
+def ROI ( image ) :
+  
+#     ROI is Region Of Interest, where we basically make unwanted information in image to 0 or black,
+#     for example, the upper half part of image is useless where most of them are sky
+#     so our region of interest is lower half part of image, so we make upper part black, and retain
+#     the lower part.
+#    first we create a same size of image with all black pixel or black image
+
+    mask = np.zeros_like ( image )
+    if len ( image.shape ) > 2:
+        ROIMask = ( 255, ) * image.shape[2]
     else:
         ROIMask = 255
+#   here are the vertices for our ROI which will be white and it will be draw over black mask
 
-    # here are the vertices for our ROI which will be white and it will be draw over black mask
     row, col = image.shape[:2]
     left_lower = [col * 0.1, row * 0.95]
     left_upper = [col * 0.4, row * 0.6]
     right_lower = [col * 0.9, row * 0.95]
     right_upper = [col * 0.6, row * 0.6]
-    vertices = np.array([[left_lower, left_upper, right_upper, right_lower]], dtype=np.int32)
+    
+    vertices = np.array( [[left_lower, left_upper, right_upper, right_lower]], dtype = np.int32 )
 
     # here it will draw the above given vertices shape on black mask that we create at beginning
-    cv2.fillPoly(mask, vertices, ROIMask)
+    cv2.fillPoly ( mask, vertices, ROIMask )
 
-    ROI_image = cv2.bitwise_and(image, mask)
+    ROI_image = cv2.bitwise_and ( image, mask )
+    
     return ROI_image
 
 
